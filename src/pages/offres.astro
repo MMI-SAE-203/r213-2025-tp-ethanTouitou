@@ -2,41 +2,10 @@
 import Header from "../components/Header.astro";
 import Base from "../layouts/Base.astro";
 import Card from "../components/card.astro";
-const offres = [
-    {
-        adresse: "2821 Lake Sevilla, Palm Harbor, TX",
-        favori: true,
-        id: "64l3n8nar836i5j",
-        nbChambres: 4,
-        nbSdb: 2,
-        nomMaison: "Beverly Springfield",
-        prix: 2700,
-        surface: 45,
-        imgUrl: "/public/img/une-cabane-de-plage-rustique_5361007.jpg",
-    },
-    {
-        adresse: "2699 Green Valley, Highland Lake",
-        favori: true,
-        id: "lo831zeg10hpm9y",
-        nbChambres: 4,
-        nbSdb: 2,
-        nomMaison: "Palm Harbor",
-        prix: 2095,
-        surface: 42,
-        imgUrl: "/public/img/constructeur-maison-contemporaine-lyon-avec-jardin.jpg",
-    },
-    {
-        adresse: "909 Woodland St, Michigan, IN",
-        favori: false,
-        id: "s1zuhj19x8eb242",
-        nbChambres: 4,
-        nbSdb: 3,
-        nomMaison: "Faulkner Ave",
-        prix: 4550,
-        surface: 80,
-        imgUrl: "/public/img/une-maison-bois-design-et-confortable-igc-construction-img~03a1465305014bdd_14-2638-1-da22ba1.jpg",
-    },
-];
+
+import { getOffres } from "../backend.mjs";
+
+const offres = await getOffres();
 ---
 
 <html lang="en">
@@ -53,22 +22,23 @@ const offres = [
                     @click="afficherfavori = !afficherfavori"
                     class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
                 >
-                    <span x-show="!afficherfavori" class="block"
-                        >Afficher les favoris</span
-                    >
-                    <span x-show="afficherfavori" class="block"
-                        >Afficher tout</span
+                    <span x-show="!afficherfavori" class="block">
+                        {offres.map((maison) => <Card {...maison} />)}
+                    </span>
+                    <span x-show="afficherfavori" class="block">
+                        {
+                            offres
+                                .filter((maison) => maison.favori)
+                                .map((maison) => <Card {...maison} />)
+                        }</span
                     >
                 </button>
 
                 <!-- Liste des offres -->
-                <div x-show="!afficherfavori">
-                    {offres.map((offre) => <Card {...offre} />)}
-                </div>
-                <div x-show="afficherfavori">
-                    {offres.map((offre) => offre.favori && <Card {...offre} />)}
-                </div>
+                <div x-show="!afficherfavori"></div>
+                <div x-show="afficherfavori"></div>
             </div>
+            <p>{offres.nom_maison}</p>
         </Base>
     </body>
 </html>
