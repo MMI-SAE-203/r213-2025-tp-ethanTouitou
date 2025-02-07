@@ -32,3 +32,12 @@ export async function getOffre(id) {
         return null;
     }
 }
+export async function getMaisons() {
+    try {
+        let data = await pb.collection('maison').getFullList(); // Vérifie que 'maison' est bien le bon nom de collection
+        return data;
+    } catch (error) {
+        console.error("Erreur lors de la récupération des maisons :", error);
+        return [];
+    }
+}

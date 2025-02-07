@@ -1,0 +1,39 @@
+---
+import { getMaisons } from "../../../backend.mjs";
+import Base from "../../../layouts/Base.astro";
+export const prerender = false;
+
+const { surface } = Astro.params;
+
+const surfaceValue = surface ? parseInt(surface, 10) : 80;
+console.log("Valeur de surface utilisée :", surfaceValue);
+
+const maisonsRaw = await getMaisons();
+console.log("Toutes les maisons :", maisonsRaw);
+
+// Filtrage des maisons
+const maisons = maisonsRaw.filter((m) => {
+    console.log(`Vérification maison : ${m.nomMaison}, Surface: ${m.surface}`);
+    return parseInt(m.surface, 10) > surfaceValue;
+});
+
+console.log("Maisons après filtrage :", maisons);
+---
+
+<Base titre={`Maisons avec une surface > ${surfaceValue} m²`}>
+    {
+        maisons.length > 0 ? (
+            <ul>
+                {maisons.map((maison) => (
+                    <li>
+                        <a href={`/offres/${maison.id}`}>
+                            {maison.nomMaison} - {maison.surface} m²
+                        </a>
+                    </li>
+                ))}
+            </ul>
+        ) : (
+            <p>Aucune maison trouvée</p>
+        )
+    }
+</Base>
