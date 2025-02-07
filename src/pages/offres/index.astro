@@ -1,43 +1,93 @@
 ---
 import Header from "../../components/Header.astro";
 import Base from "../../layouts/Base.astro";
-import Card from "../../components/Card.astro";
+import Cards from "../../components/Card.astro";
+import PocketBase from "pocketbase";
 
-import { getOffres } from "../../backend.mjs";
+const pb = new PocketBase("http://127.0.0.1:8090"); // Remplace par ton URL PocketBase
 
-const offres = await getOffres();
+const offres = await pb.collection("maison").getFullList({
+    sort: "-created",
+});
+
+offres.forEach((maison) => {
+    maison.imageUrl = pb.files.getURL(maison, maison.image);
+});
+
+console.log(offres);
 ---
 
-<html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width" />
-        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-        <title>Offres</title>
-    </head>
-    <body>
-        <Base titre="Offres">
-            <div x-data="{ afficherfavori: false }">
-                <button
-                    @click="afficherfavori = !afficherfavori"
-                    class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                >
-                    <span x-show="!afficherfavori" class="block">
-                        {offres.map((maison) => <Card {...maison} />)}
-                    </span>
-                    <span x-show="afficherfavori" class="block">
-                        {
-                            offres
-                                .filter((maison) => maison.favori)
-                                .map((maison) => <Card {...maison} />)
-                        }</span
-                    >
-                </button>
+<Base titre="Offres">
+    <h1 class="text-center text-3xl text-indigo-800 font-bold">Offres</h1>
+    <p class="text-center text-xl mt-8 text-indigo-800 font-semibold">
+        Découvrez nos offres
+    </p>
+    <div x-data="{ vueGrille: true }" class="text-center my-4">
+        <button
+            @click="vueGrille = true"
+            :class="{ 'bg-blue-700 text-white': vueGrille, 'bg-gray-300': !vueGrille }"
+            class="px-4 py-2 rounded-l border border-blue-700"
+        >
+            Vue Grille
+        </button>
+        <button
+            @click="vueGrille = false"
+            :class="{ 'bg-blue-700 text-white': !vueGrille, 'bg-gray-300': vueGrille }"
+            class="px-4 py-2 rounded-r border border-blue-700"
+        >
+            Vue Liste
+        </button>
+    </div>
+    <div>
+        <ul
+            x-show="vueGrille"
+            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-8"
+        >
+            {offres.map((offre) => <Cards {...offre} />)}
+        </ul>
 
-                <!-- Liste des offres -->
-                <div x-show="!afficherfavori"></div>
-                <div x-show="afficherfavori"></div>
-            </div>
-        </Base>
-    </body>
-</html>
+        <ul x-show="!vueGrille" class="space-y-4 mt-8">
+            {
+                offres.map((offre) => (
+                    <li class="bg-white shadow-md rounded-lg p-4 border flex items-center">
+                        <img
+                            src={offre.imageUrl}
+                            alt="Image de l'annonce"
+                            class="w-24 h-24 object-cover rounded mr-4"
+                        />
+                        <div>
+                            <h2 class="text-xl font-bold text-indigo-800">
+                                {offre.nomMaison}
+                            </h2>
+                            <p class="text-gray-600">{offre.adresse}</p>
+                            <p class="text-gray-600">
+                                {offre.nbChambres} chambres, {offre.nbSdb}{" "}
+                                salles de bain
+                            </p>
+                            <p class="text-gray-800 font-semibold">
+                                {offre.prix} € / mois - {offre.surface} m²
+                            </p>
+                        </div>
+                    </li>
+                ))
+            }
+        </ul>
+    </div>
+
+    <div x-data="{ afficherfavori: false }">
+        <button
+            @click="afficherfavori = !afficherfavori"
+            class="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        >
+            <span x-show="!afficherfavori">Afficher les favoris</span>
+            <span x-show="afficherfavori">Afficher tout</span>
+        </button>
+
+        <div x-show="!afficherfavori">
+            {offres.map((offre) => <Cards {...offre} />)}
+        </div>
+        <div x-show="afficherfavori">
+            {offres.map((offre) => offre.favori && <Cards {...offre} />)}
+        </div>
+    </div>
+</Base>

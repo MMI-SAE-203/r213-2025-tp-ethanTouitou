@@ -1,96 +1,125 @@
 ---
 import Header from "../components/Header.astro";
 import Base from "../layouts/Base.astro";
+import PocketBase from "pocketbase";
+import Cards from "../components/Card.astro";
+const pb = new PocketBase("http://127.0.0.1:8090"); // Remplace par ton URL PocketBase
+
+const offres = await pb.collection("maison").getFullList({
+	sort: "-created",
+});
+
+offres.forEach((maison) => {
+	maison.imageUrl = pb.files.getURL(maison, maison.image);
+});
+
+console.log(offres);
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Accueil | MonSite</title>
-		<link
-			rel="stylesheet"
-			href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
-		/>
-	</head>
-	<body class="bg-gray-100 text-gray-800">
-		<Base titre="Accueil">
-			<!-- Hero Section -->
-			<section
-				class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-20"
-			>
-				<div class="container mx-auto px-4 text-center">
-					<h1 class="text-4xl md:text-5xl font-bold mb-4">
-						Bienvenue sur MonSite !
-					</h1>
-					<p class="text-lg md:text-xl mb-6">
-						Explorez nos offres, découvrez nos services, et
-						laissez-vous inspirer.
-					</p>
-					<a
-						href="/offres"
-						class="bg-white text-blue-600 font-bold py-3 px-6 rounded-full shadow-md hover:bg-gray-100"
-					>
-						Nos Offres
-					</a>
-				</div>
-			</section>
+<Base titre="Accueil">
+	<h1 class="text-center text-3xl text-indigo-800 font-extrabold">
+		Montb'Habitat
+	</h1>
+	<p class="text-center text-xl mt-8 text-indigo-800 font-bold">
+		Agence immobilière depuis 1998 basé à montbéliard
+	</p>
+	<a
+		href="/offres"
+		class="flex justify-center mt-8 text-indigo-800 font-semibold hover:text-indigo-600"
+		>Découvrez nos offres</a
+	>
+	<p class="text-lg text-gray-600">
+		Votre agence immobilière de confiance à Montbéliard depuis 1998.
+	</p>
 
-			<!-- Content Section -->
-			<section class="py-12">
-				<div class="container mx-auto px-4">
-					<h2 class="text-3xl font-bold mb-6 text-center">
-						Nos Services
-					</h2>
-					<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-						<div
-							class="bg-white shadow-lg rounded-lg p-6 text-center"
-						>
-							<h3 class="text-xl font-bold mb-4">Service 1</h3>
-							<p>
-								Découvrez comment notre premier service peut
-								vous aider à réussir vos projets.
-							</p>
-						</div>
-						<div
-							class="bg-white shadow-lg rounded-lg p-6 text-center"
-						>
-							<h3 class="text-xl font-bold mb-4">Service 2</h3>
-							<p>
-								Profitez d'un accompagnement personnalisé avec
-								notre second service.
-							</p>
-						</div>
-						<div
-							class="bg-white shadow-lg rounded-lg p-6 text-center"
-						>
-							<h3 class="text-xl font-bold mb-4">Service 3</h3>
-							<p>
-								Nos experts sont là pour répondre à tous vos
-								besoins techniques.
-							</p>
-						</div>
-					</div>
-				</div>
-			</section>
+	<section class="mb-12">
+		<h2 class="text-2xl font-semibold text-gray-800 mb-4">Notre mission</h2>
+		<p class="text-gray-600 mb-6">
+			Nous vous accompagnons dans tous vos projets immobiliers avec
+			professionnalisme, proximité et transparence. Que vous souhaitiez
+			acheter, vendre, louer ou gérer votre patrimoine immobilier, notre
+			équipe est là pour vous aider à chaque étape.
+		</p>
+		<ul class="list-disc list-inside text-gray-600 space-y-2">
+			<li>
+				<strong>Acheter :</strong> trouvez la maison ou l’appartement de
+				vos rêves.
+			</li>
+			<li>
+				<strong>Vendre :</strong> bénéficiez des meilleures conditions pour
+				votre bien.
+			</li>
+			<li>
+				<strong>Louer :</strong> trouvez un logement qui correspond parfaitement
+				à vos attentes.
+			</li>
+			<li>
+				<strong>Gérer :</strong> confiez-nous la gestion de votre patrimoine
+				immobilier.
+			</li>
+		</ul>
+	</section>
+	<h2 class="font-c text-blue-600">Annonces favorites</h2>
+	<div x-show="afficherfavori">
+		{offres.map((offre) => offre.favori && <Cards {...offre} />)}
+	</div>
+	<section class="mb-12">
+		<h2 class="text-2xl font-semibold text-gray-800 mb-4">
+			Pourquoi choisir Montb'Habitat ?
+		</h2>
+		<ul class="grid grid-cols-1 md:grid-cols-2 gap-6 text-gray-600">
+			<li class="p-6 bg-white rounded-lg shadow-md">
+				<h3 class="text-xl font-medium text-blue-600 mb-2">
+					Une expertise locale
+				</h3>
+				<p>
+					Notre connaissance approfondie de Montbéliard et ses
+					environs garantit des conseils sur mesure.
+				</p>
+			</li>
+			<li class="p-6 bg-white rounded-lg shadow-md">
+				<h3 class="text-xl font-medium text-blue-600 mb-2">
+					Un accompagnement complet
+				</h3>
+				<p>
+					Nous vous guidons à chaque étape, de l'estimation à la
+					signature finale.
+				</p>
+			</li>
+			<li class="p-6 bg-white rounded-lg shadow-md">
+				<h3 class="text-xl font-medium text-blue-600 mb-2">
+					Une relation de confiance
+				</h3>
+				<p>
+					Nous privilégions la transparence et l’éthique dans toutes
+					nos interactions.
+				</p>
+			</li>
+			<li class="p-6 bg-white rounded-lg shadow-md">
+				<h3 class="text-xl font-medium text-blue-600 mb-2">
+					Un large choix de biens
+				</h3>
+				<p>
+					Nous proposons des biens adaptés à tous les budgets et
+					projets.
+				</p>
+			</li>
+		</ul>
+	</section>
 
-			<!-- Call to Action -->
-			<section class="bg-blue-600 text-white py-12">
-				<div class="container mx-auto px-4 text-center">
-					<h2 class="text-3xl font-bold mb-4">Prêt à commencer ?</h2>
-					<p class="mb-6">
-						Rejoignez-nous dès aujourd'hui et transformez vos idées
-						en réalité.
-					</p>
-					<a
-						href="/contact"
-						class="bg-white text-blue-600 font-bold py-3 px-6 rounded-full shadow-md hover:bg-gray-100"
-					>
-						Contactez-nous
-					</a>
-				</div>
-			</section>
-		</Base>
-	</body>
-</html>
+	<section class="text-center">
+		<h2 class="text-2xl font-semibold text-gray-800 mb-4">
+			Contactez-nous !
+		</h2>
+		<p class="text-gray-600 mb-6">
+			Rendez-nous visite à Montbéliard ou contactez notre équipe pour
+			discuter de votre projet immobilier.
+		</p>
+		<a
+			href="/contact"
+			class="inline-block bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 transition"
+		>
+			Nous Contacter
+		</a>
+	</section>
+</Base>
