@@ -1,9 +1,9 @@
 ---
-import Header from "../components/Header.astro";
-import Base from "../layouts/Base.astro";
-import Card from "../components/card.astro";
+import Header from "../../components/Header.astro";
+import Base from "../../layouts/Base.astro";
+import Card from "../../components/Card.astro";
 
-import { getOffres } from "../backend.mjs";
+import { getOffres } from "../../backend.mjs";
 
 const offres = await getOffres();
 ---
@@ -38,7 +38,6 @@ const offres = await getOffres();
                 <div x-show="!afficherfavori"></div>
                 <div x-show="afficherfavori"></div>
             </div>
-            <p>{offres.nom_maison}</p>
         </Base>
     </body>
 </html>
