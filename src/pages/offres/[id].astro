@@ -6,14 +6,14 @@ const { id } = Astro.params;
 const offre = await getOffre(id);
 ---
 
-<Base titre={offre.nomMaison}>
-    <h2>{offre.nomMaison}</h2>
+<Base titre={offre.nom_maison}>
+    <h2>{offre.nom_maison}</h2>
     <button><a href="../">Retour en arriere</a></button>
     <ul>
         <li>{offre.adresse}</li>
         <li>Adresse : {offre.adresse}</li>
         <li>Surface : {offre.surface} m²</li>
         <li>Prix : {offre.prix} €</li>
-        <li><img src={offre.imageUrl} alt={offre.nomMaison} /></li>
+        <li><img src={offre.imageUrl} alt={offre.nom_maison} /></li>
     </ul>
 </Base>

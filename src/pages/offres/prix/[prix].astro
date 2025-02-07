@@ -3,33 +3,32 @@ import { getMaisons } from "../../../backend.mjs";
 import Base from "../../../layouts/Base.astro";
 export const prerender = false;
 
-const { surface } = Astro.params;
+const { prix } = Astro.params;
 
-const surfaceValue = surface ? parseInt(surface, 10) : 80;
-console.log("Valeur de surface utilisée :", surfaceValue);
+// Vérifier et convertir la valeur du prix
+const prixMax = prix ? parseInt(prix, 10) : 200000;
+console.log("Valeur de prix utilisée :", prixMax);
 
 const maisonsRaw = await getMaisons();
 console.log("Toutes les maisons :", maisonsRaw);
 
 // Filtrage des maisons
 const maisons = maisonsRaw.filter((m) => {
-    console.log(
-        `Vérification maison : ${m.nom_maison}, Surface: ${m.surface_maison}`,
-    );
-    return parseInt(m.surface_maison, 10) > surfaceValue;
+    console.log(`Vérification maison : ${m.nom_maison}, Prix: ${m.prix}`);
+    return parseInt(m.prix, 10) <= prixMax; // Vérifie si le prix est inférieur ou égal
 });
 
 console.log("Maisons après filtrage :", maisons);
 ---
 
-<Base titre={`Maisons avec une surface > ${surfaceValue} m²`}>
+<Base titre={`Maisons avec un prix ≤ ${prixMax} €`}>
     {
         maisons.length > 0 ? (
             <ul>
                 {maisons.map((maison) => (
                     <li>
                         <a href={`/offres/${maison.id}`}>
-                            {maison.nom_maison} - {maison.surface_maison} m²
+                            {maison.nom_maison} - {maison.prix} €
                         </a>
                     </li>
                 ))}
